@@ -1,0 +1,4 @@
+facebooksearch/bin/
+packages/
+facebooksearch/obj/
+*.suo

@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+<div>
+    <input id="searchinput" value="#heyyoufoundme"/> <button id="submitsearch">Search</button>
+</div>
+<div>
+    <label>User Count:</label>
+    <div id="usercountcontainer">
+    
+    </div>
+</div>
+
+<div>
+    <label>Messages:</label>
+    <div id="container"></div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajaxSetup({ cache: true });
+        var accesstoken = "CAACEdEose0cBABhlx6HcTg0J0PlYK7SXKZBmqBZAESOKJu5fBLO2iM5AHZBAEQ8sZBaUNZBfR4507TPd7s3V13tVmNT59LXEszyf0pINN0rMT8tTTQKUfCLeZCF5QZCXPcnd8cdyFqwZAQk7RcJXWbYZCqnUx0wL0Y67KmYTYaJMg5worftGW8FqHTXtl1LZCM4M3RZBiyjqOyBWAZDZD";
+        
+        function getData(search) {
+            var url = "https://graph.facebook.com/search?q=" + encodeURIComponent(search) + "&type=post&access_token=" + accesstoken;
+            return $.getJSON(url);
+        }
+                
+        
+        function showData(json) {
+            var arry = [];
+            $.each(json.data, function(index, item) {
+                var username = item.from.name,
+                    userid = item.from.id,
+                    message = item.message,
+                    id = item.id,
+                    type = item.type;
+
+                arry.push(username);
+
+                var html = "<div class='searchresult'>" +
+                    "<ul>" +
+                    "<li>" + username + "</li>" +
+                    "<li>" + message + "</li>" +
+                    "</ul>" +
+                    "</div>";
+
+                $('#container').append(html);
+            });
+            var s = _.countBy(json.data, function (p) {
+                return p.from.name;
+            });
+            var userhtml = "<div class='searchresult'>" + "<ul>";
+            $.each(s, function(index, item) {
+                userhtml += "<li>" + index + " - " + item + "</li>";
+
+            });
+            userhtml += "</ul>" + "</div>";
+            $('#usercountcontainer').append(userhtml);
+        }
+
+        $("#submitsearch").click(function(e) {
+            var $this = $(this);
+            var searchText = $('#searchinput').val();
+
+            $('#container').empty();
+            $('#usercountcontainer').empty();
+            $.when(getData(searchText)).done(showData);
+        });
+    });
+</script>
